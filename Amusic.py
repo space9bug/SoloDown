@@ -306,7 +306,9 @@ def get_shange_music_parm(music_url):
 
 
 def get_all_music_parm(music_url):
-    if re.match(r"^((https|http)?:\/\/kg2.qq.com)[^\s]+", music_url) is not None:
+    if re.match(r"^((https|http)?:\/\/kg[2-9].qq.com)[^\s]+", music_url) is not None:
+        music_parm = get_kg_music_parm(music_url)
+    elif re.match(r"^((https|http)?:\/\/kg.qq.com)[^\s]+", music_url) is not None:
         music_parm = get_kg_music_parm(music_url)
     elif re.match(r"^((https|http)?:\/\/node.kg.qq.com)[^\s]+", music_url) is not None:
         music_parm = get_kg_music_parm(music_url)
