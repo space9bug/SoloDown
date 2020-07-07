@@ -1,4 +1,5 @@
 import json
+import random
 import re
 import time
 from urllib import parse
@@ -305,6 +306,37 @@ def get_shange_music_parm(music_url):
     return music_parm
 
 
+def get_vv_music_parm(music_url):
+    print("开始获取VV音乐的参数")
+    # 将%xx转义符替换为它们的单字符等效项
+    url_data = parse.unquote(music_url)
+
+    # url结果
+    result = parse.urlparse(url_data)
+    print(result)
+
+    # url里的查询参数
+    query_dict = parse.parse_qs(result.query)
+    av_id = query_dict["avId"][0]
+    print(av_id)
+
+    url = "http://k.51vv.com/userPage/getAvinfo.htm?parameter={avID:" + av_id + "}&r=" + str(random.random())
+
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.129 Safari/537.36'
+    }
+
+    response = requests.request("GET", url, headers=headers)
+
+    result_data = json.loads(response.text)["result"]
+    music_url = result_data["fileURL"]
+    # 文件名不能包含下列任何字符：\/:*?"<>|       英文字符
+    music_name = re.sub(r'[\\/:*?"<>|\r\n]+', "", result_data["name"])
+
+    music_parm = [music_name, music_url]
+    return music_parm
+
+
 def get_all_music_parm(music_url):
     if re.match(r"^((https|http)?:\/\/kg[2-9].qq.com)[^\s]+", music_url) is not None:
         music_parm = get_kg_music_parm(music_url)
@@ -334,6 +366,8 @@ def get_all_music_parm(music_url):
         music_parm = get_aichang_music_parm(music_url)
     elif re.match(r"^((https|http)?:\/\/shange.musiccz.net)[^\s]+", music_url) is not None:
         music_parm = get_shange_music_parm(music_url)
+    elif re.match(r"^((https|http)?:\/\/k.51vv.com)[^\s]+", music_url) is not None:
+        music_parm = get_vv_music_parm(music_url)
     else:
         music_parm = ["null", "null"]
 
