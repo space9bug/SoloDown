@@ -337,6 +337,21 @@ def get_vv_music_parm(music_url):
     return music_parm
 
 
+def get_iting_music_parm(music_url):
+    print("开始获取爱听的参数")
+    html = requests.get(music_url).text
+
+    title_res = re.search(r'<header class="music_title">(?P<title>[\s\S]*?)</header>', html)
+    # 文件名不能包含下列任何字符：\/:*?"<>|       英文字符
+    music_name = re.sub(r'[\\/:*?"<>|\r\n]+', "", title_res.groupdict()['title'])
+    print(music_name)
+    song_url_res = re.search(r'<input type="hidden" id="ksongUrl" value="(?P<song_url>[\s\S]*?)" />', html)
+    mp3_url = song_url_res.groupdict()['song_url']
+
+    music_parm = [music_name, mp3_url]
+    return music_parm
+
+
 def get_all_music_parm(music_url):
     if re.match(r"^((https|http)?:\/\/kg[2-9].qq.com)[^\s]+", music_url) is not None:
         music_parm = get_kg_music_parm(music_url)
@@ -368,6 +383,8 @@ def get_all_music_parm(music_url):
         music_parm = get_shange_music_parm(music_url)
     elif re.match(r"^((https|http)?:\/\/k.51vv.com)[^\s]+", music_url) is not None:
         music_parm = get_vv_music_parm(music_url)
+    elif re.match(r"^((https|http)?:\/\/m.imusic.cn)[^\s]+", music_url) is not None:
+        music_parm = get_iting_music_parm(music_url)
     else:
         music_parm = ["null", "null"]
 
