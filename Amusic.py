@@ -352,6 +352,39 @@ def get_iting_music_parm(music_url):
     return music_parm
 
 
+def get_kugoudazi_music_parm(music_url):
+    print("开始获取酷狗音乐大字版的参数")
+    # 将%xx转义符替换为它们的单字符等效项
+    url_data = parse.unquote(music_url)
+
+    # url结果
+    result = parse.urlparse(url_data)
+    print(result)
+
+    # url里的查询参数
+    query_dict = parse.parse_qs(result.query)
+    data = query_dict["data"][0]
+    sign = query_dict["sign"][0]
+
+    url = "https://acsing.service.kugou.com/sing7/web/jsonp/cdn/opus/listenGetData?data=" + data + "&sign=" + sign + "&channelId=0"
+
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.129 Safari/537.36'
+    }
+
+    response = requests.request("GET", url, headers=headers)
+
+    music_data = json.loads(response.text.encode('utf8'))["data"]
+
+    # 文件名不能包含下列任何字符：\/:*?"<>|       英文字符
+    music_name = re.sub(r'[\\/:*?"<>|\r\n]+', "", music_data["opusName"])
+    print(music_name)
+    opus_url = music_data["opusUrl"]
+
+    music_parm = [music_name, opus_url]
+    return music_parm
+
+
 def get_all_music_parm(music_url):
     if re.match(r"^((https|http)?:\/\/kg[2-9].qq.com)[^\s]+", music_url) is not None:
         music_parm = get_kg_music_parm(music_url)
@@ -385,6 +418,8 @@ def get_all_music_parm(music_url):
         music_parm = get_vv_music_parm(music_url)
     elif re.match(r"^((https|http)?:\/\/m.imusic.cn)[^\s]+", music_url) is not None:
         music_parm = get_iting_music_parm(music_url)
+    elif re.match(r"^((https|http)?:\/\/activity.kugou.com)[^\s]+", music_url) is not None:
+        music_parm = get_kugoudazi_music_parm(music_url)
     else:
         music_parm = ["null", "null"]
 
