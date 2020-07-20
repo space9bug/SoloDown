@@ -420,6 +420,38 @@ def get_kuwokge_music_parm(music_url):
     return music_parm
 
 
+def get_qmks_music_parm(music_url):
+    print("开始获取全民K诗的参数")
+    # 将%xx转义符替换为它们的单字符等效项
+    url_data = parse.unquote(music_url)
+
+    # url结果
+    result = parse.urlparse(url_data)
+    print(result)
+
+    # url里的查询参数
+    query_dict = parse.parse_qs(result.query)
+    s_id = query_dict["id"][0]
+    print(s_id)
+
+    url = "https://ks.weinisongdu.com/shareOpusV3?id=" + s_id
+    html = requests.get(url).text
+
+    content_res = re.search(r'var shareContent = (?P<content>[\s\S]*?);', html)
+    content_str = content_res.groupdict()['content'].strip()
+    music_data = json.loads(content_str)
+
+    # 文件名不能包含下列任何字符：\/:*?"<>|       英文字符
+    music_name = re.sub(r'[\\/:*?"<>|\r\n]+', "", music_data["title"])
+    print(music_name)
+
+    mp3_url = music_data["dataUrl"]
+    print(mp3_url)
+
+    music_parm = [music_name, mp3_url]
+    return music_parm
+
+
 def get_all_music_parm(music_url):
     if re.match(r"^((https|http)?:\/\/kg[2-9].qq.com)[^\s]+", music_url) is not None:
         music_parm = get_kg_music_parm(music_url)
@@ -457,6 +489,8 @@ def get_all_music_parm(music_url):
         music_parm = get_kugoudazi_music_parm(music_url)
     elif re.match(r"^((https|http)?:\/\/kge.kuwo.cn)[^\s]+", music_url) is not None:
         music_parm = get_kuwokge_music_parm(music_url)
+    elif re.match(r"^((https|http)?:\/\/ks.weinisongdu.com)[^\s]+", music_url) is not None:
+        music_parm = get_qmks_music_parm(music_url)
     else:
         music_parm = ["null", "null"]
 
