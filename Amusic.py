@@ -385,6 +385,41 @@ def get_kugoudazi_music_parm(music_url):
     return music_parm
 
 
+def get_kuwokge_music_parm(music_url):
+    print("开始获取酷我K歌的参数")
+    song_id = music_url.rsplit('/', 1)[1]
+    print(song_id)
+
+    base_url = "http://nksingserver.kuwo.cn/nks/mobile/GetWorkBase?id=" + song_id
+
+    base_headers = {
+        'User-Agent': 'android-async-http/1.4.3 (http://loopj.com/android-async-http)'
+    }
+
+    base_response = requests.request("GET", base_url, headers=base_headers)
+
+    title = json.loads(base_response.text.encode('utf8'))["title"]
+    # 文件名不能包含下列任何字符：\/:*?"<>|       英文字符
+    song_name = re.sub(r'[\\/:*?"<>|\r\n]+', "", parse.unquote(title))
+    print(song_name)
+
+    detail_url = "http://nksingserver.kuwo.cn/nks/mobile/GetWorkDetail?id=" + song_id
+
+    detail_headers = {
+        'User-Agent': 'android-async-http/1.4.3 (http://loopj.com/android-async-http)'
+    }
+
+    detail_response = requests.request("GET", detail_url, headers=detail_headers)
+
+    temp_url = json.loads(detail_response.text.encode('utf8'))["url"]
+    # 将%xx转义符替换为它们的单字符等效项
+    aac_url = parse.unquote(temp_url)
+    print(aac_url)
+
+    music_parm = [song_name, aac_url]
+    return music_parm
+
+
 def get_all_music_parm(music_url):
     if re.match(r"^((https|http)?:\/\/kg[2-9].qq.com)[^\s]+", music_url) is not None:
         music_parm = get_kg_music_parm(music_url)
@@ -420,6 +455,8 @@ def get_all_music_parm(music_url):
         music_parm = get_iting_music_parm(music_url)
     elif re.match(r"^((https|http)?:\/\/activity.kugou.com)[^\s]+", music_url) is not None:
         music_parm = get_kugoudazi_music_parm(music_url)
+    elif re.match(r"^((https|http)?:\/\/kge.kuwo.cn)[^\s]+", music_url) is not None:
+        music_parm = get_kuwokge_music_parm(music_url)
     else:
         music_parm = ["null", "null"]
 
