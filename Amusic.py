@@ -452,6 +452,32 @@ def get_qmks_music_parm(music_url):
     return music_parm
 
 
+def get_tlkg_music_parm(music_url):
+    print("开始获取天籁K歌的参数")
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Linux; Android 10; LIO-AN00 Build/HUAWEILIO-AN00) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Mobile Safari/537.36'
+    }
+
+    response = requests.request("GET", music_url, headers=headers)
+
+    html = response.text
+    content_res = re.search(r'\$\(this\)\.jPlayer\("setMedia", (?P<content>[\s\S]*?)\);', html)
+    content_str = content_res.groupdict()['content'].strip()
+    print(content_str)
+
+    items_res = re.findall(r': "([\s\S]*?)"', content_str)
+
+    # 文件名不能包含下列任何字符：\/:*?"<>|       英文字符
+    song_name = re.sub(r'[\\/:*?"<>|\r\n]+', "", items_res[0])
+    print(song_name)
+
+    song_url = items_res[1]
+    print(song_url)
+
+    music_parm = [song_name, song_url]
+    return music_parm
+
+
 def get_all_music_parm(music_url):
     if re.match(r"^((https|http)?:\/\/kg[2-9].qq.com)[^\s]+", music_url) is not None:
         music_parm = get_kg_music_parm(music_url)
@@ -491,6 +517,8 @@ def get_all_music_parm(music_url):
         music_parm = get_kuwokge_music_parm(music_url)
     elif re.match(r"^((https|http)?:\/\/ks.weinisongdu.com)[^\s]+", music_url) is not None:
         music_parm = get_qmks_music_parm(music_url)
+    elif re.match(r"^((https|http)?:\/\/www.tlkg.com)[^\s]+", music_url) is not None:
+        music_parm = get_tlkg_music_parm(music_url)
     else:
         music_parm = ["null", "null"]
 
