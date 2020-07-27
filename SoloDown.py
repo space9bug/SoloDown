@@ -72,6 +72,10 @@ class Application(tk.Tk):
         if music_url == "" or music_url == "请输入分享链接即可":
             messagebox.showwarning(title="警告", message="请输入分享链接后执行")
             return
+        self.progressBar["value"] = 0
+        self.show_progress.set("")
+        self.show_screen.set(self.program_name)
+        self.update()
         try:
             music_data = Amusic.get_all_music_parm(music_url)
             if music_data[0] == "null" and music_data[1] == "null":
