@@ -478,6 +478,35 @@ def get_tlkg_music_parm(music_url):
     return music_parm
 
 
+def get_migukge_music_parm(music_url):
+    print("开始获取咪咕K歌的参数")
+    song_uuid = music_url.rsplit('=', 1)[1]
+    print(song_uuid)
+
+    url = "http://jk.ising.nf.migu.cn/share1/mv"
+
+    payload = 'uuid=' + song_uuid
+    headers = {
+        'Referer': 'http://acstatic.migu.cn/mobile/share/',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36',
+        'Content-Type': 'application/x-www-form-urlencoded'
+    }
+
+    response = requests.request("POST", url, headers=headers, data=payload)
+
+    mv_data = json.loads(response.text.encode('utf8'))["data"]["mv"]
+
+    # 文件名不能包含下列任何字符：\/:*?"<>|       英文字符
+    mp3_name = re.sub(r'[\\/:*?"<>|\r\n]+', "", mv_data["name"])
+    print(mp3_name)
+
+    mp3_url = mv_data["mp3"]
+    print(mp3_url)
+
+    music_parm = [mp3_name, mp3_url]
+    return music_parm
+
+
 def get_all_music_parm(music_url):
     if re.match(r"^((https|http)?:\/\/kg[2-9].qq.com)[^\s]+", music_url) is not None:
         music_parm = get_kg_music_parm(music_url)
@@ -519,6 +548,8 @@ def get_all_music_parm(music_url):
         music_parm = get_qmks_music_parm(music_url)
     elif re.match(r"^((https|http)?:\/\/www.tlkg.com)[^\s]+", music_url) is not None:
         music_parm = get_tlkg_music_parm(music_url)
+    elif re.match(r"^((https|http)?:\/\/acstatic.migu.cn)[^\s]+", music_url) is not None:
+        music_parm = get_migukge_music_parm(music_url)
     else:
         music_parm = ["null", "null"]
 
