@@ -143,7 +143,7 @@ def get_changya2_music_parm(music_url):
 
 
 def get_kugouchang_music_parm(music_url):
-    print("开始获取酷狗唱唱和斗歌的参数")
+    print("开始获取酷狗唱唱和斗歌和酷狗K歌的参数")
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.129 Safari/537.36'
     }
@@ -153,7 +153,10 @@ def get_kugouchang_music_parm(music_url):
     slash_location_url = pre_location_url.rsplit('/', 1)[1]
     req_parm = slash_location_url.split('-')
     data = req_parm[1][4:]
-    sign = req_parm[3][4:]
+    if len(req_parm) == 3:
+        sign = req_parm[2][4:]
+    else:
+        sign = req_parm[3][4:]
 
     url = "https://acsing.service.kugou.com/sing7/web/jsonp/cdn/opus/listenGetData?data=" + data + "&sign=" + sign + "&channelId=0"
 
