@@ -65,7 +65,12 @@ class Application(tk.Tk):
 
         # 6
         buttonFile = tk.Button(self, text="浏览输出", command=show_file_path, font=l_font)
-        buttonFile.place(x=50, y=205, width=400, height=80)
+        buttonFile.place(x=50, y=200, width=400, height=80)
+
+        # 7
+        declare_str = "声明：仅供个人录制音频下载使用"
+        labDeclare = tk.Label(self, text=declare_str, font=("宋体", 9), fg="red")
+        labDeclare.place(x=0, y=285, width=500, height=25)
 
     def audio_down(self):
         music_url = self.entryUrl.get().strip('\n')

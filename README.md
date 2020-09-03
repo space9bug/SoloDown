@@ -26,7 +26,7 @@
 
 ## 构建环境
 - python 3.8.5
-- pyinstaller 4.0.dev0
+- pyinstaller 4.0
 - 第三方库依赖：requests、filetype
 
 # 文件资源
