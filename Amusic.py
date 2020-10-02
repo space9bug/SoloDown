@@ -53,13 +53,12 @@ def get_changba_music_parm(music_url):
     print("开始获取唱吧的参数")
     html = requests.get(music_url).text
 
-    title_res = re.search(r'<div class="title">(?P<title>[\s\S]*?)</div>', html)
-    # 文件名不能包含下列任何字符：\/:*?"<>|       英文字符
-    music_name = re.sub(r'[\\/:*?"<>|\r\n]+', "", title_res.groupdict()['title'])
-    print(music_name)
     work_id_res = re.search(r'<span class="fav" data-workid="(?P<work_id>[\s\S]*?)" data-status="0">', html)
     work_id = work_id_res.groupdict()['work_id']
     mp3_url = "http://qiniuuwmp3.changba.com/" + work_id + ".mp3"
+
+    music_name = "changba" + str(int(round(time.time() * 1000)))
+    print(music_name)
 
     music_parm = [music_name, mp3_url]
     return music_parm
