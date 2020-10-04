@@ -1,16 +1,22 @@
 import os
 import re
 import subprocess
+import sys
 import tkinter as tk
 from tkinter import messagebox
 from tkinter import ttk
 
-import Amusic
 import filetype
+
+import Amusic
 
 
 def show_file_path():
-    subprocess.run(['explorer.exe', '/n,downloads'])
+    if sys.platform[:3] == "win":
+        subprocess.run(['explorer', '/n,downloads'])
+    if sys.platform == "darwin":
+        downloads_path = os.path.expanduser("~/Music/")
+        subprocess.run(['open', downloads_path])
 
 
 class Application(tk.Tk):
@@ -92,15 +98,23 @@ class Application(tk.Tk):
             self.show_screen.set(music_name)
             ###开始下载###
             try:
-                down_name = "downloads/" + music_name + ".temp"
-                str_out = ['aria2c.exe', '-o', down_name, music_play_url]
+                if sys.platform[:3] == "win":
+                    down_path = "downloads/"
+                if sys.platform == "darwin":
+                    down_path = os.path.expanduser("~/Music/")
+                down_name = music_name + ".temp"
+                str_out = ['./aria2c', '-d', down_path, '-o', down_name, music_play_url]
                 print(str_out)
-                si = subprocess.STARTUPINFO()
-                si.dwFlags = subprocess.CREATE_NEW_CONSOLE | subprocess.STARTF_USESHOWWINDOW
-                si.wShowWindow = subprocess.SW_HIDE
-                process = subprocess.Popen(str_out, shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                                           encoding="utf-8",
-                                           text=True, startupinfo=si)
+                if sys.platform[:3] == "win":
+                    si = subprocess.STARTUPINFO()
+                    si.dwFlags = subprocess.CREATE_NEW_CONSOLE | subprocess.STARTF_USESHOWWINDOW
+                    si.wShowWindow = subprocess.SW_HIDE
+                    process = subprocess.Popen(str_out, shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                                               encoding="utf-8",
+                                               text=True, startupinfo=si)
+                if sys.platform == "darwin":
+                    process = subprocess.Popen(str_out, shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                                               encoding="utf-8", text=True)
                 for line in process.stdout:
                     # print(line)
 
@@ -117,13 +131,13 @@ class Application(tk.Tk):
                     self.show_progress.set("100%")
                     self.show_screen.set("下载完成")
                     self.update()
-                    kind = filetype.guess(down_name)
+                    kind = filetype.guess(down_path + down_name)
                     if kind is None:
                         print("文件类型不支持")
                     else:
                         name_len = len(down_name) - 5
                         try:
-                            os.rename(down_name, down_name[:name_len] + "." + kind.extension)
+                            os.rename(down_path + down_name, down_path + down_name[:name_len] + "." + kind.extension)
                         except Exception as e:
                             print(e)
                             messagebox.showwarning(title="警告", message=str(e))
