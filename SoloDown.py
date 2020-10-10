@@ -93,6 +93,11 @@ class Application(tk.Tk):
                     print("不支持此分享链接或者链接格式错误")
                     messagebox.showwarning(title="警告", message="不支持此分享链接或者链接格式错误")
                     return
+                if music_data[1] == "null":
+                    music_name = music_data[0]
+                    self.show_screen.set(music_name)
+                    messagebox.showwarning(title="警告", message=music_name)
+                    return
                 music_name = music_data[0]
                 music_play_url = music_data[1]
                 self.show_screen.set(music_name)

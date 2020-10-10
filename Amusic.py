@@ -53,12 +53,35 @@ def get_changba_music_parm(music_url):
     print("开始获取唱吧的参数")
     html = requests.get(music_url).text
 
-    work_id_res = re.search(r'<span class="fav" data-workid="(?P<work_id>[\s\S]*?)" data-status="0">', html)
-    work_id = work_id_res.groupdict()['work_id']
-    mp3_url = "http://qiniuuwmp3.changba.com/" + work_id + ".mp3"
+    is_video_res = re.search(r'&isvideo=(?P<is_video>[\s\S]*?)\'', html)
+    is_video = is_video_res.groupdict()['is_video']
 
-    music_name = "changba" + str(int(round(time.time() * 1000)))
-    print(music_name)
+    if is_video == "0":
+        title_res = re.search(r'<div class="title">(?P<title>[\s\S]*?)</div>', html)
+        origin_name = title_res.groupdict()['title']
+        if origin_name == " ":
+            music_name = "changba" + str(int(round(time.time() * 1000)))
+            print(music_name)
+        else:
+            # 文件名不能包含下列任何字符：\/:*?"<>|       英文字符
+            music_name = re.sub(r'[\\/:*?"<>|\r\n]+', "", origin_name)
+            print(music_name)
+        sub_url_res = re.search(r'var a="http(?P<sub_url>[\s\S]*?)",', html)
+        sub_url = sub_url_res.groupdict()['sub_url']
+        mp3_url = "http" + sub_url
+    else:
+        work_id_res = re.search(r'<span class="fav" data-workid="(?P<work_id>[\s\S]*?)" data-status="0">', html)
+        work_id = work_id_res.groupdict()['work_id']
+        mp3_url = "http://qiniuuwmp3.changba.com/" + work_id + ".mp3"
+
+        res = requests.get(mp3_url)
+        if res.status_code == 404:
+            music_name = "不支持此唱吧MV下载"
+            print(music_name)
+            mp3_url = "null"
+        else:
+            music_name = "changba" + str(int(round(time.time() * 1000)))
+            print(music_name)
 
     music_parm = [music_name, mp3_url]
     return music_parm
