@@ -108,7 +108,7 @@ class Application(tk.Tk):
                     if sys.platform == "darwin":
                         down_path = os.path.expanduser("~/Music/")
                     down_name = music_name + ".temp"
-                    str_out = ['./aria2c', '-d', down_path, '-o', down_name, music_play_url]
+                    str_out = ['./aria2c', '-x', '8', '-d', down_path, '-o', down_name, music_play_url]
                     print(str_out)
                     if sys.platform[:3] == "win":
                         si = subprocess.STARTUPINFO()
