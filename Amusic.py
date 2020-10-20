@@ -1,3 +1,4 @@
+import base64
 import json
 import random
 import re
@@ -70,18 +71,13 @@ def get_changba_music_parm(music_url):
         sub_url = sub_url_res.groupdict()['sub_url']
         mp3_url = "http" + sub_url
     else:
-        work_id_res = re.search(r'<span class="fav" data-workid="(?P<work_id>[\s\S]*?)" data-status="0">', html)
-        work_id = work_id_res.groupdict()['work_id']
-        mp3_url = "http://qiniuuwmp3.changba.com/" + work_id + ".mp3"
+        sub_url_res = re.search(r'video_url: \'(?P<sub_url>[\s\S]*?)\',', html)
+        sub_url = sub_url_res.groupdict()['sub_url']
+        str_url = base64.b64decode(sub_url).decode("utf-8")
+        mp3_url = "http:" + str_url
 
-        res = requests.get(mp3_url)
-        if res.status_code == 404:
-            music_name = "不支持此唱吧MV下载"
-            print(music_name)
-            mp3_url = "null"
-        else:
-            music_name = "changba" + str(int(round(time.time() * 1000)))
-            print(music_name)
+        music_name = "changba" + str(int(round(time.time() * 1000)))
+        print(music_name)
 
     music_parm = [music_name, mp3_url]
     return music_parm
