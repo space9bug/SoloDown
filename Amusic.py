@@ -61,7 +61,7 @@ def get_changba_music_parm(music_url):
         title_res = re.search(r'<div class="title">(?P<title>[\s\S]*?)</div>', html)
         origin_name = title_res.groupdict()['title']
         if origin_name == " ":
-            music_name = "changba" + str(int(round(time.time() * 1000)))
+            music_name = "changba" + str(round(time.time() * 1000))
             print(music_name)
         else:
             # 文件名不能包含下列任何字符：\/:*?"<>|       英文字符
@@ -76,7 +76,7 @@ def get_changba_music_parm(music_url):
         str_url = base64.b64decode(sub_url).decode("utf-8")
         mp3_url = "http:" + str_url
 
-        music_name = "changba" + str(int(round(time.time() * 1000)))
+        music_name = "changba" + str(round(time.time() * 1000))
         print(music_name)
 
     music_parm = [music_name, mp3_url]
@@ -153,7 +153,7 @@ def get_changya2_music_parm(music_url):
     song_data = song_json_res.groupdict()['song_json'].strip()
     mp4_url = json.loads(song_data)["props"]["pageProps"]["url"]
 
-    music_name = "changya" + str(int(round(time.time() * 1000)))
+    music_name = "changya" + str(round(time.time() * 1000))
     print(music_name)
 
     music_parm = [music_name, mp4_url]
@@ -212,7 +212,7 @@ def get_kg_music_parm(music_url):
     url = "https://cgi.kg.qq.com/fcgi-bin/kg_ugc_getdetail"
 
     querystring = {"inCharset": "GB2312", "outCharset": "utf-8", "v": "4", "shareid": s_id,
-                   "_": str(int(round(time.time() * 1000)))}
+                   "_": str(round(time.time() * 1000))}
 
     headers = {
         'Host': "cgi.kg.qq.com",
@@ -246,7 +246,7 @@ def get_maozhua_music_parm(music_url):
     song_media = song_media_res.groupdict()['song_media'].strip().strip("\"")
     mp4_url = song_media.replace("\\u002F", "/")
 
-    music_name = "maozhua" + str(int(round(time.time() * 1000)))
+    music_name = "maozhua" + str(round(time.time() * 1000))
     print(music_name)
 
     music_parm = [music_name, mp4_url]
@@ -290,7 +290,7 @@ def get_tanchang_music_parm(music_url):
 
 def get_aichang_music_parm(music_url):
     print("开始获取爱唱的参数")
-    music_name = "aichang" + str(int(round(time.time() * 1000)))
+    music_name = "aichang" + str(round(time.time() * 1000))
     print(music_name)
     music_parm = [music_name, music_url]
     return music_parm
